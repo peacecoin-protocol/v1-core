@@ -14,7 +14,9 @@ import { ExchangeAllowMethod } from "./lib/Enum.sol";
 
 import { console2 } from "forge-std/console2.sol";
 
-contract PCECommunityToken is
+/// @custom:oz-upgrades-from PCECommunityToken
+
+contract PCECommunityTokenV2 is
     Initializable,
     ERC20Upgradeable,
     ERC20BurnableUpgradeable,
@@ -44,15 +46,7 @@ contract PCECommunityToken is
     event MintArigatoCreation(address indexed to, uint256 displayAmount, uint256 rawAmount);
     event MetaTransactionFeeCollected(address indexed from, address indexed to, uint256 displayFee, uint256 rawFee);
 
-    function initialize(string memory name, string memory symbol, uint256 _initialFactor) public initializer {
-        __ERC20_init(name, symbol);
-        __Ownable_init(_msgSender());
-        pceAddress = _msgSender();
-        epochTime = block.timestamp;
-        lastDecreaseTime = block.timestamp;
-        initialFactor = _initialFactor;
-        lastModifiedFactor = _initialFactor;
-    }
+    function initialize() public initializer { }
 
     function getCurrentFactor() public view returns (uint256) {
         if (lastModifiedFactor == 0) {
@@ -385,7 +379,7 @@ contract PCECommunityToken is
         Utils.LocalToken memory toToken = pceToken.getLocalToken(toTokenAddress);
         require(toToken.isExists, "Target token not found");
 
-        PCECommunityToken to = PCECommunityToken(toTokenAddress);
+        PCECommunityTokenV2 to = PCECommunityTokenV2(toTokenAddress);
         to.updateFactorIfNeeded();
 
         require(balanceOf(sender) >= amountToSwap, "Insufficient balance");
@@ -464,6 +458,6 @@ contract PCECommunityToken is
     }
 
     function version() public pure returns (string memory) {
-        return "1.0.0";
+        return "1.0.1";
     }
 }
